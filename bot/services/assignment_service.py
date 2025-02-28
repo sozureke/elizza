@@ -4,8 +4,9 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 
 class Assignment:
-    def __init__(self, name: str, due_date: str, submitted: bool, grade: str):
+    def __init__(self, name: str, link: str, due_date: str, submitted: bool, grade: str):
         self.name = name
+        self.link = link
         self.due_date = due_date
         self.submitted = submitted
         self.grade = grade
@@ -58,6 +59,7 @@ class AssignmentService:
 
                 assignment_name_elem = cells[1].find_element(By.TAG_NAME, "a")
                 assignment_name = assignment_name_elem.text.strip()
+                assignment_link = assignment_name_elem.get_attribute("href")
 
                 due_date = cells[2].text.strip()
                 submission_text = cells[3].text.strip()
@@ -68,6 +70,7 @@ class AssignmentService:
 
                 assignments.append(Assignment(
                     name=assignment_name,
+                    link=assignment_link,
                     due_date=due_date,
                     submitted=submitted,
                     grade=grade
