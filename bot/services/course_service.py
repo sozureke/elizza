@@ -20,9 +20,11 @@ class CourseService:
 			for card in cards:
 				try:
 					title_elem = card.find_element(By.CSS_SELECTOR, "span.multiline")
+					link_elem = card.find_element(By.CSS_SELECTOR, "a.aalink.coursename")
 					title = title_elem.get_attribute("title")
-					link = title_elem.get_attribute("href")
-					courses.append(Course(title, link))
+					link = link_elem.get_attribute("href")
+					if link:
+						courses.append(Course(title, link))
 				except Exception as error:
 					print("Error parsing card:", error)
 		return courses
