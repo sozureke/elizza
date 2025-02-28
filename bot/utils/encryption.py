@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 from cryptography.fernet import Fernet
 
-load_dotenv()
+load_dotenv(dotenv_path=".env.local")
 
 KEY = os.getenv("ENCRYPTION_KEY")
 cipher = Fernet(KEY)

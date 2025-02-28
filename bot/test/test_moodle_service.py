@@ -1,8 +1,8 @@
-from services.moodle_service import MoodleService
+from services.global_moodle_service import MoodleService
 from dotenv import load_dotenv
 import os
 
-load_dotenv()
+load_dotenv(dotenv_path=".env.local")
 
 def test_moodle_service():
     moodle = MoodleService()

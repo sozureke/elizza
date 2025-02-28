@@ -6,7 +6,7 @@ from handlers.init_handlers import register_handlers
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.client.default import DefaultBotProperties
 
-load_dotenv()
+load_dotenv(dotenv_path=".env.local")
 
 bot = Bot(
     token=os.getenv("TELEGRAM_BOT_TOKEN"),
