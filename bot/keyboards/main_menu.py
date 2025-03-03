@@ -13,7 +13,7 @@ def main_menu_keyboard() -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup(
         keyboard=[
             [KeyboardButton(text="📚 My courses")],
-            [KeyboardButton(text="📊 My grades")],
+            [KeyboardButton(text="📩 Сhat with me")],
             [KeyboardButton(text="🚪 Log out")]
         ],
         resize_keyboard=True
