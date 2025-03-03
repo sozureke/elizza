@@ -13,6 +13,8 @@ env
 .env.local
 
 # Build results
+
+bot/__pycache__/*
 [Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/
