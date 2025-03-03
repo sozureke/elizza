@@ -1,5 +1,10 @@
+import os
+import asyncio
+
 from aiogram import Router, types
+from aiogram.types import FSInputFile
 from aiogram.utils.keyboard import InlineKeyboardBuilder
+
 from services.course_service import CourseService
 from services.global_moodle_service import global_moodle_service
 from keyboards.course import course_keyboard
@@ -8,33 +13,68 @@ from utils.delete import deletion_helper
 course_router = Router()
 courses_cache = {}
 
+
+GIF_PATH = os.path.join(
+    os.path.dirname(__file__),  
+    "..",                       
+    "gif",                      
+    "mike-tyson-serious.mp4"    
+)
+GIF_PATH = os.path.normpath(GIF_PATH)  
+
 @course_router.message(lambda msg: msg.text == "📚 My courses")
 async def courses_handler(message: types.Message):
+    
     deletion_helper.record_message(message.chat.id, message.message_id)
     await message.delete()
 
+    
+    gif_message = None
+    if os.path.exists(GIF_PATH):
+        file = FSInputFile(GIF_PATH)
+        gif_message = await message.answer_animation(
+            animation=file,
+            caption="Loading..."
+        )
+        deletion_helper.record_message(message.chat.id, gif_message.message_id)
+    else:
+        print(f"Файл анимации не найден: {GIF_PATH}")
+
+    
+    await asyncio.sleep(2)
+
+    
+    if gif_message:
+        await gif_message.delete()
+
+    
     loading_msg = await message.answer("Loading courses...")
     deletion_helper.record_message(message.chat.id, loading_msg.message_id)
 
+    
     if not global_moodle_service.logged_in or not global_moodle_service.driver:
         await loading_msg.edit_text("You're not logged in yet. Please authorize first.")
         return
 
+    
     course_service = CourseService(global_moodle_service.driver)
     courses = course_service.get_courses()
     if not courses:
         await loading_msg.edit_text("No courses found.")
         return
 
+    
     courses_cache.clear()
     for idx, c in enumerate(courses, start=1):
         courses_cache[idx] = c
 
+    
     kb_builder = InlineKeyboardBuilder()
     for idx, c in enumerate(courses, start=1):
         kb_builder.button(text=c.title, callback_data=f"course_{idx}")
     kb_builder.adjust(1)
 
+    
     await loading_msg.edit_text(
         "Available courses (choose one):",
         reply_markup=kb_builder.as_markup()

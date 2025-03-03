@@ -1,12 +1,31 @@
+import os
+import asyncio
 from aiogram import Router, types
+from aiogram.types import FSInputFile
 from aiogram.utils.keyboard import InlineKeyboardBuilder
+
 from services.assignment_service import AssignmentService
 from services.global_moodle_service import global_moodle_service
 from keyboards.course import course_keyboard
 
-
 assignments_cache = {}
 assignments_router = Router()
+
+
+GIF_PATH = os.path.join(
+    os.path.dirname(__file__),  
+    "..",                       
+    "gif",                      
+    "loading.gif.mp4"           
+)
+GIF_PATH = os.path.normpath(GIF_PATH)
+
+async def send_loading_gif(callback: types.CallbackQuery) -> types.Message:
+    """Отправляет гифку загрузки и возвращает сообщение с ней."""
+    if os.path.exists(GIF_PATH):
+        file = FSInputFile(GIF_PATH)
+        return await callback.message.answer_animation(animation=file, caption="Loading...")
+    return None
 
 @assignments_router.callback_query(lambda c: "course_" in c.data and "_assignments" in c.data)
 async def course_assignments_handler(callback: types.CallbackQuery):
@@ -22,9 +41,18 @@ async def course_assignments_handler(callback: types.CallbackQuery):
         await callback.answer("Course not found.")
         return
 
+    
+    gif_message = await send_loading_gif(callback)
+    await asyncio.sleep(2)  
+
+    
     assignment_service = AssignmentService(global_moodle_service.driver)
     assignments = assignment_service.get_assignments(course.link)
     assignments_cache[course_idx] = assignments
+
+    
+    if gif_message:
+        await gif_message.delete()
 
     if not assignments:
         text = f"No assignments found for {course.title}."
@@ -41,10 +69,7 @@ async def course_assignments_handler(callback: types.CallbackQuery):
             text=a.name,
             callback_data=f"assignment_{course_idx}_{i}"
         )
-    builder.button(
-        text="Back to course",
-        callback_data=f"course_{course_idx}"
-    )
+    builder.button(text="Back to course", callback_data=f"course_{course_idx}")
     builder.adjust(1)
 
     await callback.message.edit_text(
@@ -52,7 +77,6 @@ async def course_assignments_handler(callback: types.CallbackQuery):
         reply_markup=builder.as_markup()
     )
     await callback.answer()
-
 
 @assignments_router.callback_query(lambda c: c.data.startswith("assignment_"))
 async def assignment_detail_handler(callback: types.CallbackQuery):
@@ -69,7 +93,14 @@ async def assignment_detail_handler(callback: types.CallbackQuery):
         await callback.answer("Assignment not found.")
         return
 
+    
+    gif_message = await send_loading_gif(callback)
+    await asyncio.sleep(2)
+
     assignment = assignment_list[assign_idx - 1]
+
+    if gif_message:
+        await gif_message.delete()
 
     text = (
         f"<b>{assignment.name}</b>\n\n"
@@ -82,33 +113,17 @@ async def assignment_detail_handler(callback: types.CallbackQuery):
 
     builder = InlineKeyboardBuilder()
     if assignment.link:
-        builder.button(
-            text="Open assignment",
-            url=assignment.link
-        )
+        builder.button(text="Open assignment", url=assignment.link)
 
     if not assignment.submitted:
-        builder.button(
-            text="Upload file",
-            callback_data=f"upload_{course_idx}_{assign_idx}"
-        )
+        builder.button(text="Upload file", callback_data=f"upload_{course_idx}_{assign_idx}")
 
-    builder.button(
-        text="Back to assignments",
-        callback_data=f"course_{course_idx}_assignments"
-    )
-
+    builder.button(text="Back to assignments", callback_data=f"course_{course_idx}_assignments")
     builder.adjust(1)
 
-    await callback.message.edit_text(
-        text,
-        parse_mode="HTML",
-        reply_markup=builder.as_markup()
-    )
+    await callback.message.edit_text(text, parse_mode="HTML", reply_markup=builder.as_markup())
     await callback.answer()
 
-
-# TODO
 @assignments_router.callback_query(lambda c: c.data.startswith("upload_"))
 async def upload_file_handler(callback: types.CallbackQuery):
     parts = callback.data.split("_")
