@@ -26,6 +26,8 @@ class MoodleService:
 			options = webdriver.ChromeOptions()
 			options.add_argument("--no-sandbox")
 			options.add_argument("--disable-dev-shm-usage")
+			user_data_dir = os.path.abspath("chrome_profile")
+			options.add_argument(f"user-data-dir={user_data_dir}")
 			# options.add_argument("--headless")
 			self.driver = webdriver.Chrome(
 				service=Service(ChromeDriverManager().install()),
@@ -51,6 +53,11 @@ class MoodleService:
 				raise ValueError("MOODLE_URL not set.")
 
 			self.driver.get(MOODLE_URL)
+			if "moodle.uni.lu/my/" in self.driver.current_url:
+				logger.info("Already logged in (session restored).")
+				self.logged_in = True
+				return True
+
 			login_button = WebDriverWait(self.driver, 10).until(
 				EC.element_to_be_clickable((By.CSS_SELECTOR, "a.btn.btn-primary.btn-block"))
 			)

@@ -16,7 +16,7 @@ async def course_assignments_handler(callback: types.CallbackQuery):
         return
 
     course_idx = int(parts[1])
-    from .courses import courses_cache
+    from .course import courses_cache
     course = courses_cache.get(course_idx)
     if not course:
         await callback.answer("Course not found.")
