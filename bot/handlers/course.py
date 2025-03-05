@@ -38,7 +38,7 @@ async def courses_handler(message: types.Message):
         )
         deletion_helper.record_message(message.chat.id, gif_message.message_id)
     else:
-        print(f"Файл анимации не найден: {GIF_PATH}")
+        print(f"Not Founded GIF: {GIF_PATH}")
 
     
     await asyncio.sleep(2)

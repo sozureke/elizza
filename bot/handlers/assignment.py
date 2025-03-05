@@ -21,7 +21,6 @@ GIF_PATH = os.path.join(
 GIF_PATH = os.path.normpath(GIF_PATH)
 
 async def send_loading_gif(callback: types.CallbackQuery) -> types.Message:
-    """Отправляет гифку загрузки и возвращает сообщение с ней."""
     if os.path.exists(GIF_PATH):
         file = FSInputFile(GIF_PATH)
         return await callback.message.answer_animation(animation=file, caption="Loading...")
@@ -95,7 +94,7 @@ async def assignment_detail_handler(callback: types.CallbackQuery):
 
     
     gif_message = await send_loading_gif(callback)
-    await asyncio.sleep(2)
+    await asyncio.sleep(1)
 
     assignment = assignment_list[assign_idx - 1]
 

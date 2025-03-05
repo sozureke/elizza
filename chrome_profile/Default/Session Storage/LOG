@@ -1,0 +1,5 @@
+2025/03/05-14:26:22.605 3048 Reusing MANIFEST C:\Users\sasha\OneDrive\Рабочий стол\bot xyesos\elizza\chrome_profile\Default\Session Storage/MANIFEST-000001
+2025/03/05-14:26:22.606 3048 Recovering log #11
+2025/03/05-14:26:22.611 3048 Reusing old log C:\Users\sasha\OneDrive\Рабочий стол\bot xyesos\elizza\chrome_profile\Default\Session Storage/000011.log 
+2025/03/05-14:28:13.970 5494 Level-0 table #16: started
+2025/03/05-14:28:13.982 5494 Level-0 table #16: 0 bytes IO error: C:\Users\sasha\OneDrive\Рабочий стол\bot xyesos\elizza\chrome_profile\Default\Session Storage/000016.ldb: Unable to create writable file (ChromeMethodBFE: 9::NewWritableFile::16)
